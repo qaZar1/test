@@ -1,0 +1,25 @@
+version: 3
+
+dotenv: ['.env']
+
+includes:
+  # migration:
+  #   taskfile: migration/Taskfile.migration.yaml
+  wallet:
+    taskfile: microservices/wallet/Taskfile.wallet.yaml
+
+tasks:
+  default:
+    desc: Список команд
+    cmds:
+      - task --list
+
+  cicd:
+    desc: Локальный CI/CD сервисов
+    cmds:
+      - docker-compose build && docker-compose up -d --force-recreate
+
+  update:
+    desc: Обновление сервисов
+    deps:
+      - wallet:update
