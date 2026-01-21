@@ -1,0 +1,108 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: Wallet API
+  description: |
+    %README.md%
+
+tags:
+  - name: get
+    x-displayName: Получение
+  - name: update
+    x-displayName: Обновление
+  
+
+paths:
+  "/api/v1/wallet":
+    post:
+      tags:
+        - update
+      summary: Обновление баланса кошелька
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WalletUpdate'
+      responses:
+        "204":
+          description: Успешное обновление баланса
+        "400":
+          description: Ошибка валидации входных данных
+        "422":
+          description: Недостаточно средств
+        "500":
+          description: Внутренняя ошибка сервиса
+  "/api/v1/wallets/{wallet_id}":
+    get:
+      tags:
+        - get
+      summary: Получение баланса кошелька
+      parameters:
+        - name: wallet_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Успешное получение баланса
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Wallet'
+        "400":
+          description: Ошибка валидации входных данных
+        "401":
+          description: Ошибка авторизации
+        "500":
+          description: Внутренняя ошибка сервиса
+
+components:
+  schemas:
+    Wallet:
+      type: object
+      description: Информация о кошельке
+      required:
+        - wallet_id
+        - amount
+      properties:
+        wallet_id:
+          type: string
+          description: ID кошелька
+          x-oapi-codegen-extra-tags:
+            db: wallet_id
+            validate: required
+        amount:
+          type: integer
+          format: int64
+          description: Сумма
+          x-oapi-codegen-extra-tags:
+            db: amount
+            validate: required
+    WalletUpdate:
+      type: object
+      description: Изменение баланса кошелька
+      required:
+        - wallet_id
+        - operation_type
+        - amount
+      properties:
+        wallet_id:
+          type: string
+          description: ID кошелька
+          x-oapi-codegen-extra-tags:
+            db: wallet_id
+            validate: required
+        operation_type:
+          type: string
+          description: Тип операции
+          x-oapi-codegen-extra-tags:
+            validate: required
+        amount:
+          type: integer
+          format: int64
+          description: Сумма
+          x-oapi-codegen-extra-tags:
+            db: amount
+            validate: required
