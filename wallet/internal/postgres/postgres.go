@@ -6,12 +6,13 @@ import (
 
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/stdlib"
-	"github.com/qaZar1/test/microservices/wallet/internal/models"
+	"github.com/jmoiron/sqlx"
+	"github.com/qaZar1/test/wallet/autogen"
 )
 
 type IPostgres interface {
-	GetWallet(walletID string) (*sql.Row, error)
-	UpdateWallet(wallet *models.Wallet) error
+	GetWallet(walletID string) (*autogen.Wallet, error)
+	UpsertWallet(wallet *autogen.WalletUpdate) error
 }
 
 type Config struct {
@@ -22,16 +23,16 @@ type Config struct {
 	Password string
 }
 
+type postgres struct {
+	db *sqlx.DB
+}
+
 const (
 	driver = "pgx"
 )
 
 func NewPostgres(cfg Config) IPostgres {
-	return &postgres{db: newPostgres(cfg)}
-}
-
-type postgres struct {
-	db *sql.DB
+	return &postgres{db: sqlx.NewDb(newPostgres(cfg), driver)}
 }
 
 func newPostgres(cfg Config) *sql.DB {
@@ -55,5 +56,12 @@ func newPostgres(cfg Config) *sql.DB {
 		panic(err)
 	}
 
+	db.SetMaxOpenConns(30)
+	db.SetMaxIdleConns(10)
+
 	return db
+}
+
+func (pg *postgres) Close() error {
+	return pg.db.Close()
 }

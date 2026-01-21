@@ -29,8 +29,8 @@ paths:
           description: Успешное обновление баланса
         "400":
           description: Ошибка валидации входных данных
-        "401":
-          description: Ошибка авторизации
+        "422":
+          description: Недостаточно средств
         "500":
           description: Внутренняя ошибка сервиса
   "/api/v1/wallets/{wallet_id}":
@@ -74,7 +74,8 @@ components:
             db: wallet_id
             validate: required
         amount:
-          type: string
+          type: integer
+          format: int64
           description: Сумма
           x-oapi-codegen-extra-tags:
             db: amount
@@ -99,7 +100,8 @@ components:
           x-oapi-codegen-extra-tags:
             validate: required
         amount:
-          type: string
+          type: integer
+          format: int64
           description: Сумма
           x-oapi-codegen-extra-tags:
             db: amount

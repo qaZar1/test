@@ -6,7 +6,7 @@ includes:
   # migration:
   #   taskfile: migration/Taskfile.migration.yaml
   wallet:
-    taskfile: microservices/wallet/Taskfile.wallet.yaml
+    taskfile: wallet/Taskfile.wallet.yaml
 
 tasks:
   default:

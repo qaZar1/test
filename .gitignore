@@ -4,3 +4,4 @@
 .vscode
 **/autogen/**
 **/vendor/**
+*.js
