@@ -1,2 +1,0 @@
-DROP TABLE IF EXISTS wallets.balances;
-DROP SCHEMA IF EXISTS wallets;

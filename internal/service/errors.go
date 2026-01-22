@@ -8,6 +8,7 @@ var (
 	ErrInvalidRequestBody   = errors.New("invalid request body")
 	ErrNotEnoughFunds       = errors.New("not enough funds")
 	ErrInternalError        = errors.New("internal error")
+	ErrValidationFailed     = errors.New("validation failed")
 
 	ErrInvalidID      = errors.New("invalid wallet ID")
 	ErrWalletNotFound = errors.New("wallet not found")
