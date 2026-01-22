@@ -37,8 +37,10 @@ func New() *Config {
 		panic(err)
 	}
 
+	address := ":" + os.Getenv(address)
+
 	return &Config{
-		Address:  os.Getenv(address),
+		Address:  address,
 		Hostname: os.Getenv(dbHost),
 		Port:     port,
 		Database: os.Getenv(dbName),

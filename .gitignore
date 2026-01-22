@@ -5,7 +5,10 @@
 **/autogen/**
 **/vendor/
 *.js
+/.reports
 
 *.txt
 *.html
 *.out
+*.xml
+/postgres-data/

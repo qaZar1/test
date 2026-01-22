@@ -28,29 +28,26 @@ clean: ## Очистить рабочее окружение
 mock-gen: setup ## Генерация mock
 	go generate ./...
 
-oapi-code-gen: setup oapi-doc-gen
-	oapi-codegen -o $(AUTOGEN)/server.go -old-config-style -package autogen -generate chi-server $(AUTOGEN)/docs/oapi3.yaml
-	oapi-codegen -o $(AUTOGEN)/types.go  -old-config-style -package autogen -generate types $(AUTOGEN)/docs/oapi3.yaml
-	oapi-codegen -o $(AUTOGEN)/client.go -old-config-style -package autogen -generate client $(AUTOGEN)/docs/oapi3.yaml
-
-oapi-doc-gen: setup oapi-yaml-gen
-	redoc-cli build $(AUTOGEN)/docs/oapi3.yaml -o $(AUTOGEN)/docs/user-doc.html
+tests: mock-gen ## Запуск авто-тестов
+	go test -race -cover -coverprofile $(REPORTS)/coverage.out ./...
+	go tool cover -html=$(REPORTS)/coverage.out -o $(REPORTS)/coverage.html
 
 oapi-yaml-gen: setup
 	mkdir -p $(AUTOGEN)/docs
 	sed -e 's/^/    /' README.md > $(AUTOGEN)/docs/README.md
 	sed -e '/    %README.md%/{' -e "r $(AUTOGEN)/README.md" -e 'd' -e '}' oapi3.yaml > $(AUTOGEN)/docs/oapi3.yaml
 
-format: setup ## Запуск форматирования исходного кода
-	go run $(GOLANGCI-LINT) run ./... --fix
+oapi-doc-gen: setup oapi-yaml-gen
+	redoc-cli build $(AUTOGEN)/docs/oapi3.yaml -o $(AUTOGEN)/docs/user-doc.html
 
-lint: setup ## Запуск линтеров
-	go run $(GOLANGCI-LINT) run ./... --out-format checkstyle > $(REPORTS)/golangci-lint.xml
+oapi-code-gen: setup oapi-doc-gen
+	oapi-codegen -o $(AUTOGEN)/server.go -old-config-style -package autogen -generate chi-server $(AUTOGEN)/docs/oapi3.yaml
+	oapi-codegen -o $(AUTOGEN)/types.go  -old-config-style -package autogen -generate types $(AUTOGEN)/docs/oapi3.yaml
+	oapi-codegen -o $(AUTOGEN)/client.go -old-config-style -package autogen -generate client $(AUTOGEN)/docs/oapi3.yaml
 
-tests: mock-gen ## Запуск авто-тестов
-	go test -race -cover -coverprofile $(REPORTS)/coverage.out ./...
-	go tool cover -html=$(REPORTS)/coverage.out -o $(REPORTS)/coverage.html
+up:
+	docker compose -f 'docker-compose.yml' --env-file config.env up -d --build
 
-all: format lint oapi-code-gen tests ## Последовательный запуск основных команд
+all: oapi-code-gen tests ## Последовательный запуск основных команд
 
 .DEFAULT_GOAL := help
