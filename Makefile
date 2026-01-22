@@ -46,7 +46,7 @@ oapi-code-gen: setup oapi-doc-gen
 	oapi-codegen -o $(AUTOGEN)/client.go -old-config-style -package autogen -generate client $(AUTOGEN)/docs/oapi3.yaml
 
 up:
-	docker compose -f 'docker-compose.yml' --env-file config.env up -d --build
+	docker compose -f 'docker-compose.yml' --env-file ./cmd/wallet/config.env up -d --build
 
 all: oapi-code-gen tests ## Последовательный запуск основных команд
 
