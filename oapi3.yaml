@@ -93,16 +93,16 @@ components:
           description: ID кошелька
           x-oapi-codegen-extra-tags:
             db: wallet_id
-            validate: required
+            validate: "required,uuid"
         operation_type:
           type: string
           description: Тип операции
           x-oapi-codegen-extra-tags:
-            validate: required
+            validate: "required,oneof=DEPOSIT WITHDRAW"
         amount:
           type: integer
           format: int64
           description: Сумма
           x-oapi-codegen-extra-tags:
             db: amount
-            validate: required
+            validate: "required,min=1"

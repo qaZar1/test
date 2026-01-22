@@ -1,18 +1,19 @@
-package postgres
+package repository
 
 import (
-	"database/sql"
 	"fmt"
 
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/stdlib"
 	"github.com/jmoiron/sqlx"
-	"github.com/qaZar1/test/wallet/autogen"
+	"github.com/qaZar1/test/autogen"
 )
 
-type IPostgres interface {
+//go:generate mockgen -source=postgres.go -package mocks -destination ../../autogen/mocks/postgres.go
+type IRepository interface {
 	GetWallet(walletID string) (*autogen.Wallet, error)
-	UpsertWallet(wallet *autogen.WalletUpdate) error
+	UpsertWallet(wallet autogen.WalletUpdate) error
+	Close() error
 }
 
 type Config struct {
@@ -27,15 +28,13 @@ type postgres struct {
 	db *sqlx.DB
 }
 
-const (
-	driver = "pgx"
-)
-
-func NewPostgres(cfg Config) IPostgres {
-	return &postgres{db: sqlx.NewDb(newPostgres(cfg), driver)}
+func NewRepository(cfg Config) IRepository {
+	return &postgres{db: newPostgres(cfg)}
 }
 
-func newPostgres(cfg Config) *sql.DB {
+func newPostgres(cfg Config) *sqlx.DB {
+	const driver = "pgx"
+
 	pattern := fmt.Sprintf(
 		"host=%s port=%d database=%s user=%s password=%s sslmode=disable",
 		cfg.Hostname, cfg.Port, cfg.Database, cfg.User, cfg.Password,
@@ -47,7 +46,7 @@ func newPostgres(cfg Config) *sql.DB {
 	}
 
 	connection := stdlib.RegisterConnConfig(config)
-	db, err := sql.Open(driver, connection)
+	db, err := sqlx.Open(driver, connection)
 	if err != nil {
 		panic(err)
 	}

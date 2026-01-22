@@ -1,4 +1,4 @@
-package utils
+package service
 
 import (
 	"encoding/json"
@@ -16,7 +16,7 @@ var (
 	ErrFailedToWriteResponse  = errors.New("failed to write response")
 )
 
-func WriteJSON(w http.ResponseWriter, status int, data interface{}) {
+func writeJSON(w http.ResponseWriter, status int, data interface{}) {
 	w.Header().Set(ContentType, ContentTypeJSON)
 	w.WriteHeader(status)
 	if err := json.NewEncoder(w).Encode(data); err != nil {
@@ -25,11 +25,11 @@ func WriteJSON(w http.ResponseWriter, status int, data interface{}) {
 	}
 }
 
-func WriteNoContent(w http.ResponseWriter) {
+func writeNoContent(w http.ResponseWriter) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
-func WriteString(w http.ResponseWriter, status int, message string) {
+func writeString(w http.ResponseWriter, status int, message string) {
 	w.Header().Set(ContentType, ContentTypeJSON)
 	w.WriteHeader(status)
 	if _, err := w.Write([]byte(message)); err != nil {

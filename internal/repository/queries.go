@@ -1,11 +1,11 @@
-package postgres
+package repository
 
 import (
 	"database/sql"
 	"errors"
 	"strconv"
 
-	"github.com/qaZar1/test/wallet/autogen"
+	"github.com/qaZar1/test/autogen"
 )
 
 var (
@@ -35,18 +35,18 @@ WHERE wallet_id = $1;
 		return nil, ErrWalletNotFound
 	}
 
-	amountInt, err := strconv.Atoi(amountStr)
+	amountFloat, err := strconv.ParseFloat(amountStr, 64)
 	if err != nil {
 		return nil, err
 	}
 
 	return &autogen.Wallet{
 		WalletId: walletIDStr,
-		Amount:   int64(amountInt),
+		Amount:   int64(amountFloat),
 	}, nil
 }
 
-func (pg *postgres) UpsertWallet(wallet *autogen.WalletUpdate) error {
+func (pg *postgres) UpsertWallet(wallet autogen.WalletUpdate) error {
 	const query = `
 INSERT INTO wallets.balances (wallet_id, amount)
 VALUES ($1, $2)
